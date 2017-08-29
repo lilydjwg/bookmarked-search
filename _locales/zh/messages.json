@@ -1,0 +1,22 @@
+{
+  "extensionName": {
+    "message": "书签搜索",
+    "description": "Name of the extension."
+  },
+  
+  "extensionDescription": {
+    "message": "使用已加为书签的搜索引擎搜索选定文本",
+    "description": "Description of the add-on."
+  },
+  
+  "contextMenuItemRoot": {
+    "message": "使用书签搜索",
+    "description": "Title of root context menu item."
+  },
+  
+  "contextMenuItemEmpty": {
+    "message": "未找到已加为书签的搜索引擎",
+    "description": "Title of context menu item in submenu if no bookmarked search engines found."
+  }
+  
+}

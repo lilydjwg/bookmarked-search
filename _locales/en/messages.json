@@ -1,0 +1,22 @@
+{
+  "extensionName": {
+    "message": "Bookmarked Search",
+    "description": "Name of the extension."
+  },
+  
+  "extensionDescription": {
+    "message": "Searches the selected text using a search engine from your bookmarked search engines",
+    "description": "Description of the add-on."
+  },
+  
+  "contextMenuItemRoot": {
+    "message": "Search with",
+    "description": "Title of root context menu item."
+  },
+  
+  "contextMenuItemEmpty": {
+    "message": "No bookmarked search engines found",
+    "description": "Title of context menu item in submenu if no bookmarked search engines found."
+  }
+  
+}

@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+  "name": "__MSG_extensionName__",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
+  "version": "0.1",
+  "author": "lilydjwg",
+  "applications": {
+    "gecko": {
+      "id": "bookmarked-search@lilydjwg.me"
+    }
+  },
+
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "permissions": [
+    "contextMenus",
+    "bookmarks",
+    "storage"
+  ],
+  "icons": {
+    "48": "icons/search.svg",
+    "96": "icons/search.svg"
+  }
+}
