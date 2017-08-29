@@ -1,6 +1,8 @@
-function traverseTree(node, results) {
+const searchEngines = new Map()
+
+function traverseTree(node) {
   if(node.url && node.url.includes('%s')) {
-    results.push({
+    searchEngines.set(node.id, {
       url: node.url,
       title: node.title,
     })
@@ -8,20 +10,22 @@ function traverseTree(node, results) {
 
   if(node.children) {
     for(let child of node.children) {
-      traverseTree(child, results)
+      traverseTree(child)
     }
   }
 }
 
-async function init_search_engines() {
+async function initSearchEngines() {
   const trees = await browser.bookmarks.getTree()
-  const searchEngines = []
-  traverseTree(trees[0], searchEngines)
+  traverseTree(trees[0])
   console.log('Found bookmarked search engines:', searchEngines)
+  updateMenus()
+}
 
+function updateMenus() {
   browser.contextMenus.removeAll()
 
-  for(let se of searchEngines) {
+  for(let se of searchEngines.values()) {
     browser.contextMenus.create({
       id: se.url,
       title: se.title,
@@ -44,4 +48,39 @@ browser.contextMenus.onClicked.addListener(function(info, tab) {
   })
 })
 
-init_search_engines()
+browser.bookmarks.onCreated.addListener(function(id, node) {
+  if(node.url && node.url.includes('%s')) {
+    console.log('new bookmarked search engine', node)
+    browser.contextMenus.create({
+      id: node.url,
+      title: node.title,
+      contexts: ['selection']
+    })
+  }
+})
+
+browser.bookmarks.onChanged.addListener(function(id, change) {
+  if(change.url && change.url.includes('%s')) {
+    console.log('updated bookmarked search engine', change)
+    searchEngines.set(id, change)
+    updateMenus()
+  } else if(change.url && searchEngines.has(id)) {
+    console.log('no longer bookmarked search engine', change)
+    searchEngines.delete(id)
+    updateMenus()
+  } else if(searchEngines.has(id) && change.title) {
+    const se = searchEngines.get(id)
+    se.title = change.title
+    updateMenus()
+  }
+})
+
+browser.bookmarks.onRemoved.addListener(function(id, info) {
+  if(searchEngines.has(id)) {
+    console.log('removed bookmarked search engine', info)
+    searchEngines.delete(id)
+    updateMenus()
+  }
+})
+
+initSearchEngines()
