@@ -3,6 +3,11 @@ const RootMenuId = 'bookmarked-search@lilydjwg.me'
 const EmptyMenuId = 'EMPTY'
 let LOGGING = false
 
+// compatible with Google Chrome and Opera
+if(typeof browser == 'undefined') {
+  browser = chrome // eslint-disable-line no-global-assign
+}
+
 function log(...args) {
   if(LOGGING) {
     console.log(...args)
@@ -30,11 +35,12 @@ function traverseTree(node) {
   }
 }
 
-async function initSearchEngines() {
-  const trees = await browser.bookmarks.getTree()
-  traverseTree(trees[0])
-  log('Found bookmarked search engines:', searchEngines)
-  updateMenus()
+function initSearchEngines() {
+  browser.bookmarks.getTree(trees => {
+    traverseTree(trees[0])
+    log('Found bookmarked search engines:', searchEngines)
+    updateMenus()
+  })
 }
 
 function updateMenus() {
