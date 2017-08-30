@@ -92,16 +92,25 @@ browser.bookmarks.onCreated.addListener(function(id, node) {
   }
 })
 
-browser.bookmarks.onChanged.addListener(function(id, change) {
+browser.bookmarks.onChanged.addListener(async function(id, change) {
   if(change.url && change.url.includes('%s')) {
-    log('updated bookmarked search engine', change)
-    searchEngines.set(id, change)
+    log('updated url of bookmarked search engine', change)
+    const se = searchEngines.get(id) || {}
+    se.url = change.url
+    if(change.title) {
+      se.title = change.title
+    } else if(!se.title) {
+      const bookmarks = await browser.bookmarks.get(id)
+      se.title = bookmarks[0].title
+    }
+    searchEngines.set(id, se)
     updateMenus()
   } else if(change.url && searchEngines.has(id)) {
     log('no longer bookmarked search engine', change)
     searchEngines.delete(id)
     updateMenus()
   } else if(searchEngines.has(id) && change.title) {
+    log('updated title of bookmarked search engine', change)
     const se = searchEngines.get(id)
     se.title = change.title
     updateMenus()
