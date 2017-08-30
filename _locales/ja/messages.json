@@ -1,0 +1,22 @@
+{
+  "extensionName": {
+    "message": "ブックマーク検索",
+    "description": "Name of the extension."
+  },
+  
+  "extensionDescription": {
+    "message": "ブックマークに追加された検索エンジンで選択している文字を検索する",
+    "description": "Description of the add-on."
+  },
+  
+  "contextMenuItemRoot": {
+    "message": "ブックマーク検索",
+    "description": "Title of root context menu item."
+  },
+  
+  "contextMenuItemEmpty": {
+    "message": "ブックマークに検索エンジンが見つかりません",
+    "description": "Title of context menu item in submenu if no bookmarked search engines found."
+  }
+  
+}
