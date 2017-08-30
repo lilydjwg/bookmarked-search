@@ -82,7 +82,7 @@ browser.contextMenus.onClicked.addListener(function(info, tab) {
 browser.bookmarks.onCreated.addListener(function(id, node) {
   if(node.url && node.url.includes('%s')) {
     log('new bookmarked search engine', node)
-    browser.contextMenus.remove(EmptyMenuId).catch(e => {})
+    browser.contextMenus.remove(EmptyMenuId).catch(_ => {})
     browser.contextMenus.create({
       id: node.url,
       title: node.title,
