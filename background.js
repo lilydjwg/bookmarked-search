@@ -1,4 +1,6 @@
 const searchEngines = new Map()
+const RootMenuId = 'bookmarked-search@lilydjwg.me'
+const EmptyMenuId = 'EMPTY'
 let LOGGING = false
 
 function log(...args) {
@@ -37,13 +39,29 @@ async function initSearchEngines() {
 
 function updateMenus() {
   browser.contextMenus.removeAll()
+  browser.contextMenus.create({
+    id: RootMenuId,
+    title: browser.i18n.getMessage('contextMenuItemRoot'),
+    contexts: ['selection'],
+  })
 
-  for(let se of searchEngines.values()) {
+  if(searchEngines.size == 0) {
     browser.contextMenus.create({
-      id: se.url,
-      title: se.title,
-      contexts: ['selection']
+      id: EmptyMenuId,
+      title: browser.i18n.getMessage('contextMenuItemEmpty'),
+      contexts: ['selection'],
+      parentId: RootMenuId,
+      enabled: false,
     })
+  } else {
+    for(let se of searchEngines.values()) {
+      browser.contextMenus.create({
+        id: se.url,
+        title: se.title,
+        contexts: ['selection'],
+        parentId: RootMenuId,
+      })
+    }
   }
 }
 
@@ -64,10 +82,12 @@ browser.contextMenus.onClicked.addListener(function(info, tab) {
 browser.bookmarks.onCreated.addListener(function(id, node) {
   if(node.url && node.url.includes('%s')) {
     log('new bookmarked search engine', node)
+    browser.contextMenus.remove(EmptyMenuId).catch(e => {})
     browser.contextMenus.create({
       id: node.url,
       title: node.title,
-      contexts: ['selection']
+      contexts: ['selection'],
+      parentId: RootMenuId,
     })
   }
 })
