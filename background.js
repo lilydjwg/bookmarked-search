@@ -1,4 +1,17 @@
 const searchEngines = new Map()
+let LOGGING = false
+
+function log(...args) {
+  if(LOGGING) {
+    console.log(...args)
+  }
+}
+
+function error(...args) {
+  if(LOGGING) {
+    console.error(...args)
+  }
+}
 
 function traverseTree(node) {
   if(node.url && node.url.includes('%s')) {
@@ -18,7 +31,7 @@ function traverseTree(node) {
 async function initSearchEngines() {
   const trees = await browser.bookmarks.getTree()
   traverseTree(trees[0])
-  console.log('Found bookmarked search engines:', searchEngines)
+  log('Found bookmarked search engines:', searchEngines)
   updateMenus()
 }
 
@@ -44,13 +57,13 @@ browser.contextMenus.onClicked.addListener(function(info, tab) {
     openerTabId: tab.id,
     url: targetUrl
   }).then(null, (e) => {
-    console.error(e)
+    error(e)
   })
 })
 
 browser.bookmarks.onCreated.addListener(function(id, node) {
   if(node.url && node.url.includes('%s')) {
-    console.log('new bookmarked search engine', node)
+    log('new bookmarked search engine', node)
     browser.contextMenus.create({
       id: node.url,
       title: node.title,
@@ -61,11 +74,11 @@ browser.bookmarks.onCreated.addListener(function(id, node) {
 
 browser.bookmarks.onChanged.addListener(function(id, change) {
   if(change.url && change.url.includes('%s')) {
-    console.log('updated bookmarked search engine', change)
+    log('updated bookmarked search engine', change)
     searchEngines.set(id, change)
     updateMenus()
   } else if(change.url && searchEngines.has(id)) {
-    console.log('no longer bookmarked search engine', change)
+    log('no longer bookmarked search engine', change)
     searchEngines.delete(id)
     updateMenus()
   } else if(searchEngines.has(id) && change.title) {
@@ -77,7 +90,7 @@ browser.bookmarks.onChanged.addListener(function(id, change) {
 
 browser.bookmarks.onRemoved.addListener(function(id, info) {
   if(searchEngines.has(id)) {
-    console.log('removed bookmarked search engine', info)
+    log('removed bookmarked search engine', info)
     searchEngines.delete(id)
     updateMenus()
   }
