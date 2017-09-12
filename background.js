@@ -2,6 +2,7 @@ const searchEngines = new Map()
 const RootMenuId = 'bookmarked-search@lilydjwg.me'
 const EmptyMenuId = 'EMPTY'
 let LOGGING = false
+let useOpenerTabId = true
 
 // compatible with Google Chrome and Opera
 if(typeof browser == 'undefined') {
@@ -76,13 +77,29 @@ browser.contextMenus.onClicked.addListener(function(info, tab) {
   const urlPattern = info.menuItemId
   const targetUrl = urlPattern.replace(
     '%s', encodeURIComponent(searchString))
-  browser.tabs.create({
+  const options = {
     active: false,
-    openerTabId: tab.id,
-    url: targetUrl
-  }).then(null, (e) => {
-    error(e)
-  })
+    url: targetUrl,
+  }
+  if(useOpenerTabId) {
+    options.openerTabId = tab.id
+  }else{
+    options.index = tab.index + 1
+  }
+  try {
+    browser.tabs.create(options).then(null, (e) => {
+      error(e)
+    })
+  }catch(e){
+    if(`${e}`.includes('openerTabId')) {
+      useOpenerTabId = false
+      delete options.openerTabId
+      options.index = tab.index + 1
+      browser.tabs.create(options).then(null, (e) => {
+        error(e)
+      })
+    }
+  }
 })
 
 browser.bookmarks.onCreated.addListener(function(id, node) {
