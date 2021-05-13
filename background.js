@@ -77,29 +77,13 @@ browser.contextMenus.onClicked.addListener(function(info, tab) {
   const urlPattern = info.menuItemId
   const targetUrl = urlPattern.replace(
     '%s', encodeURIComponent(searchString))
-  const options = {
-    active: false,
-    url: targetUrl,
-  }
-  if(useOpenerTabId) {
-    options.openerTabId = tab.id
-  }else{
-    options.index = tab.index + 1
-  }
-  try {
-    browser.tabs.create(options).then(null, (e) => {
-      error(e)
-    })
-  }catch(e){
-    if(`${e}`.includes('openerTabId')) {
-      useOpenerTabId = false
-      delete options.openerTabId
-      options.index = tab.index + 1
-      browser.tabs.create(options).then(null, (e) => {
-        error(e)
-      })
-    }
-  }
+  browser.tabs.create({
+    active: !(info.button === 1 || info.modifiers.includes('Ctrl')),
+    openerTabId: tab.id,
+    url: targetUrl
+  }).then(null, (e) => {
+    error(e)
+  })
 })
 
 browser.bookmarks.onCreated.addListener(function(id, node) {
